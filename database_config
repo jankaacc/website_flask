@@ -1,0 +1,16 @@
+import os
+
+
+SECRET_KEY = 'you-will-never-guess'
+DEBUG=True
+
+
+DB_USERNAME = 'postgres'
+DB_PASSWORD = 'poloki'
+BLOG_DATABASE_NAME = 'users'
+DB_HOST = 'localhost'
+DB_URI = "postgresql://%s:%s@%s/%s" %(DB_USERNAME,DB_PASSWORD,DB_HOST,BLOG_DATABASE_NAME)
+SQLALCHEMY_DATABASE_URI = DB_URI
+SQLALCHEMY_TRACK_MODIFICATIONS = True
+UPLOADED_IMAGES_DEST =  '/home/jankaacc/repos/second_website_flask/application/static/images'
+UPLOADED_IMAGES_URL = '/static/images/'

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ blog.name }}{% endblock %}
+
+{% block picture %}
+
+            <center><img src="{{ url_for('static', filename='images/python.png') }}" height="150px" class="img-rounded"></center>
+
+{% endblock %}
+
+
+{% block content %}
+
+<!--<div class="row">-->
+
+    <div class="col-md-6">
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div id="messages">
+              <ul class=flashes>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+            {% endwith %}
+
+    <h1><a href="{{ url_for('index') }}">{{ blog.name }}</a></h1>
+
+    <div class="post-list">
+        {% for post in posts.items %}
+            <div class="row post-item">
+                    <div class="col-md-9">
+                        <h4><a href="{{ url_for('article',slug=post.slug) }}">{{ post.title }}</a></h4>
+                        <div class="text-muted">Posted by<a href="{{ url_for('author',slug=post.author.slug) }}">{{ post.author.fullname }}</a>
+                        on {{ post.publish_date.strftime('%Y-%m-%d') }}
+                        in <a href="{{ url_for('category',slug=post.category.slug) }}">{{ post.category.name }}</a>
+                        </div>
+                    </div>
+                <div class="col-md-3">
+                    {% if post.image %}
+                    <img src="{{ post.imgsrc }}" height="60px" class="img-rounded"/>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+
+
+    </div>
+
+
+        <div class="post-paginate">
+
+            {% if posts.has_prev %}
+            <a href="{{ url_for('index', page=posts.prev_num)}}">&lt;&lt;Newer posts</a>
+            {% else %}
+            &lt;&lt; Newer posts
+            {% endif %}
+            |
+            {% if posts.has_next %}
+            <a href="{{ url_for('index', page=posts.next_num)}}">Older Posts&gt;&gt;</a>
+            {% else %}
+            Older Posts&gt;&gt;
+            {% endif %}
+
+        </div>
+
+
+
+    </div>
+
+<!--</div>-->
+
+
+{% endblock %}

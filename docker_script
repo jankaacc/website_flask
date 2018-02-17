@@ -1,0 +1,278 @@
+jankaacc@jan-y50:~$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+ubuntu              latest              747cb2d60bbe        19 hours ago        122MB
+hello-world         latest              05a3bd381fc2        4 weeks ago         1.84kB
+jankaacc@jan-y50:~$ docker run hello-world
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://cloud.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/engine/userguide/
+
+jankaacc@jan-y50:~$ docker run --name db -e POSTGRES_PASSWORD=test -d -p 3306:3306 postgre
+Unable to find image 'postgre:latest' locally
+docker: Error response from daemon: pull access denied for postgre, repository does not exist or may require 'docker login'.
+See 'docker run --help'.
+jankaacc@jan-y50:~$ docker run hello-world
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://cloud.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/engine/userguide/
+
+jankaacc@jan-y50:~$ docker run --name db -e POSTGRES_PASSWORD=test -d -p 3306:3306 postgres
+Unable to find image 'postgres:latest' locally
+latest: Pulling from library/postgres
+3e17c6eae66c: Pull complete 
+3d89ae9a47e4: Pull complete 
+f7726fda7efe: Pull complete 
+d1838499bd8f: Pull complete 
+a5ec5aa60735: Pull complete 
+1571d7170291: Pull complete 
+0d6e41e13732: Pull complete 
+787e3c45a9bb: Pull complete 
+7b234cf83b22: Pull complete 
+3a8ad2440289: Pull complete 
+c58cd00fd1b1: Pull complete 
+ff781a2b3014: Pull complete 
+5dcdc973df69: Pull complete 
+Digest: sha256:0adb3da10ce7130473126631d5c198e4a416d55ea032653f7c4d983ad0086f6d
+Status: Downloaded newer image for postgres:latest
+be93e459950745be9344f0bb0fd4b4a7d620456f31f23552373694d23dcf13d2
+jankaacc@jan-y50:~$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+ubuntu              latest              747cb2d60bbe        19 hours ago        122MB
+postgres            latest              0ab78a2ecd53        38 hours ago        287MB
+hello-world         latest              05a3bd381fc2        4 weeks ago         1.84kB
+jankaacc@jan-y50:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                              NAMES
+be93e4599507        postgres            "docker-entrypoint..."   4 minutes ago       Up 4 minutes        0.0.0.0:3306->3306/tcp, 5432/tcp   db
+jankaacc@jan-y50:~$ docker run --name psql -it --link db:pscli --rm postgres sh -c 'exec pscli -uroot -ptest -hpscli' 
+sh: 1: exec: pscli: not found
+jankaacc@jan-y50:~$ docker run --name psql-client -it --link db:psql --rm postgres sh -c 'exec psql -uroot -ptest -hpsql' 
+psql: invalid option -- 'u'
+Try "psql --help" for more information.
+jankaacc@jan-y50:~$ docker run -it --rm --link db:postgres postgres psql -h postgres -U postgres psqlPassword for user postgres: 
+psql: FATAL:  password authentication failed for user "postgres"
+jankaacc@jan-y50:~$ docker run -it --rm --link db:postgres postgres psql -h postgres -U postgres psqlPassword for user postgres: 
+psql: FATAL:  database "psql" does not exist
+jankaacc@jan-y50:~$ docker run -it --link db:postgres --rm postgres sh -c 'exec postgres -uroot -ptest -hpostgres'
+"root" execution of the PostgreSQL server is not permitted.
+The server must be started under an unprivileged user ID to prevent
+possible system security compromise.  See the documentation for
+more information on how to properly start the server.
+jankaacc@jan-y50:~$ docker run -it --rm --link db:postgres postgres psql -h postgres -U root psqlPassword for user root: 
+psql: FATAL:  password authentication failed for user "root"
+jankaacc@jan-y50:~$ docker run -it --rm --link db:postgres postgres psql -h postgres -U root -ptest
+psql: invalid port number: "test"
+jankaacc@jan-y50:~$ docker run -it --rm --link db:postgres postgres psql -h postgres -U root -p test
+psql: invalid port number: "test"
+jankaacc@jan-y50:~$ docker run -it --rm --link db:postgres postgres psql -h postgres -U postgres
+Password for user postgres: 
+psql (10.0)
+Type "help" for help.
+
+postgres=# \l
+                                 List of databases
+   Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges   
+-----------+----------+----------+------------+------------+-----------------------
+ postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+ template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+(3 rows)
+
+postgres=# CREATE DATABASE my_test_user_db;
+CREATE DATABASE
+postgres=# \l
+                                    List of databases
+      Name       |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges   
+-----------------+----------+----------+------------+------------+-----------------------
+ my_test_user_db | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+ postgres        | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+ template0       | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+                 |          |          |            |            | postgres=CTc/postgres
+ template1       | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+                 |          |          |            |            | postgres=CTc/postgres
+(4 rows)
+
+postgres=# USE my_test_user_db;
+ERROR:  syntax error at or near "USE"
+LINE 1: USE my_test_user_db;
+        ^
+postgres=# \c my_test_user_db 
+You are now connected to database "my_test_user_db" as user "postgres".
+my_test_user_db=# CREATE TABLE user(
+my_test_user_db(# user_id INT AUTO_INCREMENT,
+my_test_user_db(# username VARCHAR(64) NOT NULL,
+my_test_user_db(# password VARCHAR(64) NOT NULL,
+my_test_user_db(# PRIMARY KEY(user_id)
+my_test_user_db(# );
+ERROR:  syntax error at or near "user"
+LINE 1: CREATE TABLE user(
+                     ^
+my_test_user_db=# CREATE TABLE films (
+my_test_user_db(#     code        char(5) CONSTRAINT firstkey PRIMARY KEY,
+my_test_user_db(#     title       varchar(40) NOT NULL,
+my_test_user_db(#     did         integer NOT NULL,
+my_test_user_db(#     date_prod   date,
+my_test_user_db(#     kind        varchar(10),
+my_test_user_db(#     len         interval hour to minute
+my_test_user_db(# );
+CREATE TABLE
+my_test_user_db=# \dt
+         List of relations
+ Schema | Name  | Type  |  Owner   
+--------+-------+-------+----------
+ public | films | table | postgres
+(1 row)
+
+my_test_user_db=# DROP TABLE films
+my_test_user_db-# \dt
+         List of relations
+ Schema | Name  | Type  |  Owner   
+--------+-------+-------+----------
+ public | films | table | postgres
+(1 row)
+
+my_test_user_db-# DROP TABLE films;
+ERROR:  syntax error at or near "DROP"
+LINE 2: DROP TABLE films;
+        ^
+my_test_user_db=# DROP TABLE films;
+DROP TABLE
+my_test_user_db=# \dt
+Did not find any relations.
+my_test_user_db=# clear
+my_test_user_db-# \dt
+Did not find any relations.
+my_test_user_db-# CREATE TABLE films (
+my_test_user_db(#     code        char(5),
+my_test_user_db(#     title       varchar(40),
+my_test_user_db(#     did         integer,
+my_test_user_db(#     date_prod   date,
+my_test_user_db(#     kind        varchar(10),
+my_test_user_db(#     len         interval hour to minute,
+my_test_user_db(# ^X^C
+my_test_user_db=# CREATE TABLE user (
+my_test_user_db(# user_id firstkey PRIMARY KEY,
+my_test_user_db(# username varchar(64) NOT NULL,
+my_test_user_db(# password varchar(64) NOT NULL
+my_test_user_db(# );
+ERROR:  syntax error at or near "user"
+LINE 1: CREATE TABLE user (
+                     ^
+my_test_user_db=# CREATE TABLE users (                                                               user_id firstkey PRIMARY KEY,                                                                        username varchar(64) NOT NULL,                                                                       password varchar(64) NOT NULL                                                                        );
+ERROR:  type "firstkey" does not exist
+LINE 2: user_id firstkey PRIMARY KEY,
+                ^
+my_test_user_db=# CREATE TABLE users (                                                               user_id PRIMARY KEY,                                                                                 username varchar(64) NOT NULL,                                                                       password varchar(64) NOT NULL                                                                        );
+ERROR:  syntax error at or near "PRIMARY"
+LINE 2: user_id PRIMARY KEY,
+                ^
+my_test_user_db=# CREATE TABLE users (                                                               user_id integer PRIMARY KEY,                                                                         username varchar(64) NOT NULL,                                                                       password varchar(64) NOT NULL                                                                        );
+CREATE TABLE
+my_test_user_db=# \dt
+         List of relations
+ Schema | Name  | Type  |  Owner   
+--------+-------+-------+----------
+ public | users | table | postgres
+(1 row)
+
+my_test_user_db=# INSERT INTO users ('','jankaacc','test');
+ERROR:  syntax error at or near "''"
+LINE 1: INSERT INTO users ('','jankaacc','test');
+                           ^
+my_test_user_db=# INSERT INTO users ('jankaacc','test');
+ERROR:  syntax error at or near "'jankaacc'"
+LINE 1: INSERT INTO users ('jankaacc','test');
+                           ^
+my_test_user_db=# INSERT INTO users (,'jankaacc','test');
+ERROR:  syntax error at or near ","
+LINE 1: INSERT INTO users (,'jankaacc','test');
+                           ^
+my_test_user_db=# INSERT INTO users (1,'jankaacc','test');
+ERROR:  syntax error at or near "1"
+LINE 1: INSERT INTO users (1,'jankaacc','test');
+                           ^
+my_test_user_db=# INSERT INTO users ('1','jankaacc','test');
+ERROR:  syntax error at or near "'1'"
+LINE 1: INSERT INTO users ('1','jankaacc','test');
+                           ^
+my_test_user_db=# DROP TABLE users;
+DROP TABLE
+my_test_user_db=# CREATE TABLE users (                                                               user_id PRIMARY KEY SERIAL,                                                                          username varchar(64) NOT NULL,                                                                       password varchar(64) NOT NULL                                                                        );
+ERROR:  syntax error at or near "PRIMARY"
+LINE 2: user_id PRIMARY KEY SERIAL,
+                ^
+my_test_user_db=# CREATE TABLE users (                                                               user_id SERIAL PRIMARY KEY,                                                                          username varchar(64) NOT NULL,                                                                       password varchar(64) NOT NULL                                                                        );
+CREATE TABLE
+my_test_user_db=# INSERT INTO users ('jankaacc','test');                                         ERROR:  syntax error at or near "'jankaacc'"
+LINE 1: INSERT INTO users ('jankaacc','test');
+                           ^
+my_test_user_db=# INSERT INTO users VALUES('','jankacc','test')
+my_test_user_db-# SELECT * FROM users;
+ERROR:  syntax error at or near "SELECT"
+LINE 2: SELECT * FROM users;
+        ^
+my_test_user_db=# INSERT INTO users VALUES('','jankacc','test')SELECT * FROM users;                  ERROR:  syntax error at or near "SELECT"
+LINE 1: INSERT INTO users VALUES('','jankacc','test')SELECT * FROM u...
+                                                     ^
+my_test_user_db=# SELECT * FROM users;
+ user_id | username | password 
+---------+----------+----------
+(0 rows)
+
+my_test_user_db=# INSERT INTO users VALUES('','jankacc','test');
+ERROR:  invalid input syntax for integer: ""
+LINE 1: INSERT INTO users VALUES('','jankacc','test');
+                                 ^
+my_test_user_db=# INSERT INTO users VALUES('jankacc','test');
+ERROR:  invalid input syntax for integer: "jankacc"
+LINE 1: INSERT INTO users VALUES('jankacc','test');
+                                 ^
+my_test_user_db=# INSERT INTO users VALUES(,'jankacc','test');
+ERROR:  syntax error at or near ","
+LINE 1: INSERT INTO users VALUES(,'jankacc','test');
+                                 ^
+my_test_user_db=# INSERT INTO users (username, password) VALUES('jankacc','test');
+INSERT 0 1
+my_test_user_db=# SELECT * FROM users;
+ user_id | username | password 
+---------+----------+----------
+       1 | jankacc  | test
+(1 row)
+
+my_test_user_db=# 
+

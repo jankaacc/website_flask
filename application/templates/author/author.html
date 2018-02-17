@@ -1,0 +1,53 @@
+{% extends 'base.html'%}
+
+{% block picture %}
+    {% if session.username %}
+        {% if author.image %}
+            <center><img src="{{ author.imgsrc }}" height="150px" class="img-rounded"></center>
+        {% else %}
+            <center><img src="{{ url_for('static', filename='images/python.png') }}" height="150px" class="img-rounded"></center>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+
+{% block title %}About - {{ author.fullname}}{% endblock %}
+
+{% block content %}
+
+<div id="topbar"><center><h1>{{ author.fullname }}</h1></center></div>
+
+
+<div class="row">
+
+    <div class="col-md-3">
+        {% if author.image %}
+        <img src="{{ author.imgsrc }}" class="img-rounded">
+        {% else %}
+        <img src="{{ url_for('static', filename='images/python2.png') }}" class="img-rounded">
+        {% endif %}
+    </div>
+
+    <div class="col-md-3">
+        <h3>Name: {{ author.fullname }}</h3>
+        <h3>Email: {{ author.email }}</h3>
+        <h3>Intrests: {{ author.intrests }}</h3>
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-md-6">
+
+    </div>
+
+    <div class="col-md-3">
+        <h3>Posts:</h3>
+        {% for post in author.posts %}
+            <h4><a href="{{ url_for('article', slug=post.slug) }}"> {{ post.title }}</a></h4>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
